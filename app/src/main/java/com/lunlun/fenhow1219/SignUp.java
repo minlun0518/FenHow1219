@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -163,7 +164,7 @@ public class SignUp extends AppCompatActivity {
                                         startActivity(intent);
                                         finish();
                                     } else {
-                                        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getApplicationContext(), "註冊成功", Toast.LENGTH_LONG).show();
                                     }
                                 }
                             }
@@ -192,7 +193,7 @@ public class SignUp extends AppCompatActivity {
                                             startActivity(intent);
                                             finish();
                                         } else {
-                                            Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getApplicationContext(), "註冊成功", Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 }
@@ -239,14 +240,21 @@ public class SignUp extends AppCompatActivity {
 
     }
 
-    public void getImei() {
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
-            return;
+    public void getImei(){
+        imei = findViewById(R.id.ed_imei);
+        try {
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            if (ActivityCompat.checkSelfPermission(SignUp.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(SignUp.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
+                return;
+            }
+            IMEINumber = telephonyManager.getDeviceId();
+
+        }catch (Exception e){
+            Log.d(TAG,"使用模擬器中，找不到IMEI");
+            IMEINumber = "使用模擬器中，找不到IMEI";
+
         }
-        IMEINumber = telephonyManager.getDeviceId();
-//        imei.setText(IMEINumber);
     }
 
     @Override

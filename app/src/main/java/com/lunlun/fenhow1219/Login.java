@@ -98,29 +98,58 @@ public class Login extends AppCompatActivity {
         findViews();
         getImei();
         deviceManages = new ArrayList<>();
-        //deviceManages.add(new DeviceManage(1,"357798080499328",0,"null"));
-
+//        deviceManages.add(new DeviceManage(1,"357798080499328",0,"null"));
+        Log.d(TAG,"getImei: result = "+ IMEINumber);
         checkDivicd();
+
     }
 
     private void checkDivicd() {
         Log.d(TAG,"DeviceManage : "+IMEINumber);
-        int i;
-        for(i=0;i<deviceManages.size();i++){
-            if(deviceManages.get(i).getDeviceImei().contains(IMEINumber)){
-                imei.setText("公雞公雞呱呱呱");
-                touchID.setVisibility(View.INVISIBLE);
-                faceID.setVisibility(View.INVISIBLE);
-                lololo();
-            }else {
-                mlinearLayout.setVisibility(View.INVISIBLE);
-                imei.setText(IMEINumber);
-            }
+//        int i;
+//        for(i=0;i<deviceManages.size();i++){
+//            if(deviceManages.get(i).getDeviceImei().contains(IMEINumber)){
+//                imei.setText("公雞公雞呱呱呱");
+//                touchID.setVisibility(View.INVISIBLE);
+//                faceID.setVisibility(View.INVISIBLE);
+//                lololo();
+//            }else {
+//                mlinearLayout.setVisibility(View.INVISIBLE);
+//                imei.setText(IMEINumber);
+//            }
+//        }
+
+        if (!IMEINumber.equals("")) {
+            Handler handler = new Handler();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    String[] field = new String[1];
+                    field[0] = "imei_p";
+                    String[] data = new String[1];
+                    data[0] = IMEINumber;
+                    PutData putData = new PutData(getString(R.string.imeiPublic_php), "POST", field, data);
+                    if (putData.startPut()) {
+                        if (putData.onComplete()) {
+                            String result = putData.getResult();
+                            if (result.equals("Get IMEI Public Success")) {
+                                imei.setText("近期登入");
+                                touchID.setVisibility(View.INVISIBLE);
+                                faceID.setVisibility(View.INVISIBLE);
+                                lololo();
+                            } else {
+                                mlinearLayout.setVisibility(View.INVISIBLE);
+                                imei.setText(IMEINumber);
+                            }
+                        }
+                    }
+                }
+            });
         }
     }
 
 //    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void lololo() {
+    public void lololo() {
         List<HotUserModel> hotUserList = new ArrayList<>();
         hotUserList.add(new HotUserModel(1,"45478",null,"ChiaW","000000"));
         hotUserList.add(new HotUserModel(2,"59487",null,"LanLan","000000"));
@@ -195,7 +224,7 @@ public class Login extends AppCompatActivity {
         }
     };
 
-    private  void  loginSuccess(){
+    private void loginSuccess(){
         if (rememberme_checkBox_statue) {
             Log.d(TAG, "rememberme_checkBox_statue is :" + rememberme_checkBox_statue);
             SharedPreferences settingpref = getSharedPreferences("test", MODE_PRIVATE);
@@ -208,7 +237,6 @@ public class Login extends AppCompatActivity {
             Log.d(TAG, "settingpref is :" + rememberme_checkBox_statue + " " + IMEINumber + " " + userInput + " " + password);
         }
     }
-
 
     private void findViews() {
         textInputEditTextIDorEmail = findViewById(R.id.IDorEmail);
@@ -254,7 +282,7 @@ public class Login extends AppCompatActivity {
 //            textInputEditTextIDorEmail.setText(setting.getString("PREF_USERID", ""));
 //        }
 
-        //還沒有帳號嗎？點此註冊
+        //點此註冊
         textViewSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -344,12 +372,18 @@ public class Login extends AppCompatActivity {
     //取得imei
     public void getImei(){
         imei = findViewById(R.id.ed_imei);
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(Login.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(Login.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
-            return;
+        try {
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            if (ActivityCompat.checkSelfPermission(Login.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(Login.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
+                return;
+            }
+            IMEINumber = telephonyManager.getDeviceId();
+
+        }catch (Exception e){
+//            IMEINumber = "使用模擬器中，找不到IMEI";
+//            IMEINumber = "1000000000ccccs";
         }
-        IMEINumber = telephonyManager.getDeviceId();
     }
 
     @Override

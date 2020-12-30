@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="Widget.Theme.FenHow1219.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/cathayhospital1</item>
+    </style>
+
+    <style name="Widget.Theme.FenHow1219.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/colorPrimary</item>//底下按鈕
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    </style>
+</resources>
