@@ -1,41 +1,26 @@
 package com.lunlun.fenhow1219;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.ViewModelProvider;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.hardware.biometrics.BiometricPrompt;
-import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CancellationSignal;
 import android.os.Handler;
 import android.provider.Settings;
 
 import android.telephony.TelephonyManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
-import android.util.Patterns;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -63,9 +48,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import static android.util.Patterns.EMAIL_ADDRESS;
-import static java.security.AccessController.getContext;
-
 public class Login extends AppCompatActivity {
     private BiometricPromptManager mManager;
     private static final String TAG = Log.class.getSimpleName();
@@ -85,15 +67,9 @@ public class Login extends AppCompatActivity {
     private String userInput;
     private String password;
     private CheckBox rememberme_checkBox;
-    private List<DeviceManage> deviceManages;
     private ImageView touchID;
     private ImageView faceID;
     private LinearLayout mlinearLayout;
-
-    //  指紋辨識
-//    private KeyguardManager mKeyguardManager;
-//    private FingerprintManager mFingerprintManager;
-//    private CancellationSignal cancellationSignal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,28 +80,12 @@ public class Login extends AppCompatActivity {
         handleSSLHandshake();
         findViews();
         getImei();
-        deviceManages = new ArrayList<>();
-//        deviceManages.add(new DeviceManage(1,"357798080499328",0,"null"));
-        Log.d(TAG,"getImei: result = "+ IMEINumber);
         checkDivicd();
 
     }
 
     private void checkDivicd() {
         Log.d(TAG,"DeviceManage : "+IMEINumber);
-//        int i;
-//        for(i=0;i<deviceManages.size();i++){
-//            if(deviceManages.get(i).getDeviceImei().contains(IMEINumber)){
-//                imei.setText("公雞公雞呱呱呱");
-//                touchID.setVisibility(View.INVISIBLE);
-//                faceID.setVisibility(View.INVISIBLE);
-//                lololo();
-//            }else {
-//                mlinearLayout.setVisibility(View.INVISIBLE);
-//                imei.setText(IMEINumber);
-//            }
-//        }
-
         if (!IMEINumber.equals("")) {
             Handler handler = new Handler();
             handler.post(new Runnable() {
@@ -155,7 +115,6 @@ public class Login extends AppCompatActivity {
         }
     }
 
-//    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void lololo() {
         List<HotUserModel> hotUserList = new ArrayList<>();
         hotUserList.add(new HotUserModel(1,"45478",null,"ChiaW","000000"));
@@ -229,7 +188,7 @@ public class Login extends AppCompatActivity {
         } else {
             Toast.makeText(getApplicationContext(), "All fields require", Toast.LENGTH_LONG).show();
         }
-    };
+    }
 
     private void loginSuccess(){
         if (rememberme_checkBox_statue) {
@@ -244,7 +203,7 @@ public class Login extends AppCompatActivity {
             Log.d(TAG, "settingpref is :" + rememberme_checkBox_statue + " " + IMEINumber + " " + userInput + " " + password);
         }
     }
-    private TouchID go ;
+
     private void findViews() {
         textInputEditTextIDorEmail = findViewById(R.id.IDorEmail);
         textInputEditTextPassword = findViewById(R.id.password);
@@ -406,29 +365,9 @@ public class Login extends AppCompatActivity {
         }
     }
 
-//    private String android_id = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
     //取得imei
     public void getImei() {
         imei = findViewById(R.id.ed_imei);
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-//        if (ActivityCompat.checkSelfPermission(Login.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(Login.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
-//            return;
-//        }
-//
-//        try {
-//            if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) {
-//                //Tablet
-//                IMEINumber = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
-//            } else {
-//                //Mobile
-//                IMEINumber = telephonyManager.getDeviceId();
-//            }
-////            IMEINumber = telephonyManager.getDeviceId().toString();
-//            Log.d(TAG,"使用模擬器中，到IMEI"+IMEINumber);
-//        }catch (Exception ee){
-//            Log.d(TAG,"使用模擬器中，找不到IMEI"+ee);
-//        }
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             IMEINumber = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
             Log.d(TAG,"使用模擬器中，到IMEI = "+IMEINumber);
