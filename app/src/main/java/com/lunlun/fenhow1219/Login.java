@@ -7,14 +7,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.biometrics.BiometricPrompt;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -80,16 +83,14 @@ public class Login extends AppCompatActivity {
     private String password;
     private CheckBox rememberme_checkBox;
     private List<DeviceManage> deviceManages;
-    DeviceManage dd;
-    TouchID touch;
     private ImageView touchID;
     private ImageView faceID;
     private LinearLayout mlinearLayout;
 
     //  指紋辨識
-    private KeyguardManager mKeyguardManager;
-    private FingerprintManager mFingerprintManager;
-    private CancellationSignal cancellationSignal;
+//    private KeyguardManager mKeyguardManager;
+//    private FingerprintManager mFingerprintManager;
+//    private CancellationSignal cancellationSignal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,7 +240,7 @@ public class Login extends AppCompatActivity {
             Log.d(TAG, "settingpref is :" + rememberme_checkBox_statue + " " + IMEINumber + " " + userInput + " " + password);
         }
     }
-
+private TouchID ttouchID;
     private void findViews() {
         textInputEditTextIDorEmail = findViewById(R.id.IDorEmail);
         textInputEditTextPassword = findViewById(R.id.password);
@@ -288,6 +289,7 @@ public class Login extends AppCompatActivity {
         textViewSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Intent intent = new Intent(getApplicationContext(), SignUp.class);
                 startActivity(intent);
                 finish();
@@ -329,11 +331,11 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(Login.this,"使用指紋辨識",Toast.LENGTH_SHORT).show();
-                Intent TouchIDIntent = new Intent(Login.this,TouchID.class);
                 try {
-                    startActivity(TouchIDIntent);
-                }catch (Exception e){
-                    Toast.makeText(Login.this,"無法使用指紋辨識",Toast.LENGTH_SHORT).show();
+                    ttouchID.startFingerprintListening();
+                }catch (Exception ee){
+                    Toast.makeText(Login.this,"無法使用指紋辨識"+ee,Toast.LENGTH_SHORT).show();
+                    Log.d(TAG,"  "+ee);
                 }
             }
         });
@@ -388,8 +390,6 @@ public class Login extends AppCompatActivity {
             IMEINumber = telephonyManager.getDeviceId();
         }catch (Exception e){
             Log.d(TAG,"使用模擬器中，找不到IMEI");
-//            IMEINumber = "使用模擬器中，找不到IMEI";
-//            IMEINumber = "1000000000ccccs";
         }
     }
 
@@ -398,13 +398,6 @@ public class Login extends AppCompatActivity {
 //        getIntent().putExtra("LOGIN_ID",eemail);
         setResult(RESULT_OK,getIntent());
         finish();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-//        cancellationSignal.cancel();
-        cancellationSignal = null;
     }
 
     @Override

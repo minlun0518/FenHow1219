@@ -13,9 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FenHow1219">
         <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.FenHow1219.NoActionBar">
+        </activity>
+        <activity
             android:name=".WelcomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_welcome"
             android:theme="@style/Theme.FenHow1219.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,6 +29,7 @@
         </activity>
         <activity android:name=".Login" />
         <activity android:name=".SignUp" />
+<!--        <activity android:name=".TouchID" />-->
     </application>
 
 </manifest>
