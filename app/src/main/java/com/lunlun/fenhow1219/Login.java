@@ -2,6 +2,7 @@ package com.lunlun.fenhow1219;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -63,6 +64,7 @@ public class Login extends AppCompatActivity {
 
     private static final String TAG = Log.class.getSimpleName();
     private static final int REQUEST_CODE = 101;
+
     boolean isMail = false;
     private Switch sw;
 
@@ -327,7 +329,12 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(Login.this,"使用指紋辨識",Toast.LENGTH_SHORT).show();
-                touch.startFingerprintListening();//開始掃描
+                Intent TouchIDIntent = new Intent(Login.this,TouchID.class);
+                try {
+                    startActivity(TouchIDIntent);
+                }catch (Exception e){
+                    Toast.makeText(Login.this,"無法使用指紋辨識",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -379,11 +386,25 @@ public class Login extends AppCompatActivity {
                 return;
             }
             IMEINumber = telephonyManager.getDeviceId();
-
         }catch (Exception e){
+            Log.d(TAG,"使用模擬器中，找不到IMEI");
 //            IMEINumber = "使用模擬器中，找不到IMEI";
 //            IMEINumber = "1000000000ccccs";
         }
+    }
+
+    public void verifiedsuccessfully(){
+//        getIntent().putExtra("LOGIN_IMEI",imei.toString());
+//        getIntent().putExtra("LOGIN_ID",eemail);
+        setResult(RESULT_OK,getIntent());
+        finish();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+//        cancellationSignal.cancel();
+        cancellationSignal = null;
     }
 
     @Override

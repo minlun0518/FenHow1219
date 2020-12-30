@@ -252,8 +252,7 @@ public class SignUp extends AppCompatActivity {
 
         }catch (Exception e){
             Log.d(TAG,"使用模擬器中，找不到IMEI");
-            IMEINumber = "使用模擬器中，找不到IMEI";
-
+//            IMEINumber = "使用模擬器中，找不到IMEI";
         }
     }
 

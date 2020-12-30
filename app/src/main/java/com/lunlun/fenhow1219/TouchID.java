@@ -3,67 +3,108 @@ package com.lunlun.fenhow1219;
 import android.Manifest;
 import android.app.Activity;
 import android.app.KeyguardManager;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-public class TouchID  extends AppCompatActivity {
+//@RequiresApi(api = )
+public class TouchID extends AppCompatActivity {
+
+    private CancellationSignal cancellationSignal;
     private KeyguardManager mKeyguardManager;
     private FingerprintManager mFingerprintManager;
-    private CancellationSignal cancellationSignal;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-    public void startFingerprintListening() {
+        mKeyguardManager = (KeyguardManager) getSystemService(Activity.KEYGUARD_SERVICE);
+        mFingerprintManager = (FingerprintManager) getSystemService(Activity.FINGERPRINT_SERVICE);
+
+        super.onCreate(savedInstanceState);
+        if (!mKeyguardManager.isKeyguardSecure()) {
+            return;
+        }
+        if (checkSelfPermission(Manifest.permission.USE_FINGERPRINT) == PackageManager.PERMISSION_GRANTED) {
+            if (!mFingerprintManager.isHardwareDetected()) {
+                return;
+            }
+            if (!mFingerprintManager.hasEnrolledFingerprints()) {
+                return;
+            }
+        }
+        startFingerprintListening();
+    }
+
+    private void startFingerprintListening() {
         cancellationSignal = new CancellationSignal();
-        if (checkSelfPermission(Manifest.permission.USE_FINGERPRINT) == PackageManager.PERMISSION_GRANTED) //In SDK 23, we need to check the permission before we call FingerprintManager API functionality.
-        {
-            mFingerprintManager.authenticate(
-                    null, //crypto objects 的 wrapper class，可以透過它讓 authenticate 過程更為安全，但也可以不使用。
-                    cancellationSignal, //用來取消 authenticate 的 object
-                    0, //optional flags; should be 0
-                    mAuthenticationCallback, //callback 用來接收 authenticate 成功與否，有三個 callback method
-                    null); //optional 的參數，如果有使用，FingerprintManager 會透過它來傳遞訊息
+        if (checkSelfPermission(Manifest.permission.USE_FINGERPRINT) == PackageManager.PERMISSION_GRANTED) {
+            mFingerprintManager.authenticate(null, cancellationSignal, 0, mAuthenticationCallback, null);
         }
     }
 
-    FingerprintManager.AuthenticationCallback mAuthenticationCallback = new FingerprintManager.AuthenticationCallback(){
+    FingerprintManager.AuthenticationCallback mAuthenticationCallback = new FingerprintManager.AuthenticationCallback() {
+
         @Override
         public void onAuthenticationError(int errorCode, CharSequence errString) {
+            super.onAuthenticationError(errorCode, errString);
             Log.e("", "error 辨識錯誤" + errorCode + " " + errString);
-            new AlertDialog.Builder(getApplicationContext())
-                    .setTitle("指紋辨識結果")
-                    .setMessage("辨識錯誤")
-                    .setPositiveButton("OK", null)
-                    .show();
+
+//            new AlertDialog.Builder(TouchID.this)
+//                    .setTitle("指紋辨識結果")
+//                    .setMessage("辨識錯誤")
+//                    .setPositiveButton("OK", null)
+//                    .show();
         }
-        @Override
-        public void onAuthenticationFailed() {
-            Log.e("", "辨識失敗 onAuthenticationFailed");
-            new AlertDialog.Builder(getApplicationContext())
-                    .setTitle("指紋辨識結果")
-                    .setMessage("辨識失敗")
-                    .setPositiveButton("OK", null)
-                    .show();
-        }
+
+//        @Override
+//        public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+//            super.onAuthenticationHelp(helpCode, helpString);
+//        }
+
         @Override
         public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
-            Log.i("", "辨識成功 onAuthenticationSucceeded");
-            new AlertDialog.Builder(getApplicationContext())
+            super.onAuthenticationSucceeded(result);
+            new AlertDialog.Builder(TouchID.this)
                     .setTitle("指紋辨識結果")
-                    .setMessage("辨識成功")
-                    .setPositiveButton("OK",null )
+                    .setMessage("辨識OK")
+                    .setPositiveButton("OK", null)
                     .show();
-//            return;
+            finish();
+        }
+
+        @Override
+        public void onAuthenticationFailed() {
+            super.onAuthenticationFailed();
         }
     };
-
 }
+
+//
+//
+//
+//    public TouchID(FingerprintManager mKeyguardManager) {
+//        this.mKeyguardManager = mKeyguardManager;
+//
+//
+//    }
+//
+//    public TouchID(int contentLayoutId, FingerprintManager mKeyguardManager) {
+//        super(contentLayoutId);
+//        this.mKeyguardManager = mKeyguardManager;
+//    }
+//
+//    public FingerprintManager getmKeyguardManager() {
+//        return mKeyguardManager;
+//    }
+//
+//    public void setmKeyguardManager(FingerprintManager mKeyguardManager) {
+//        this.mKeyguardManager = mKeyguardManager;
+//    }
