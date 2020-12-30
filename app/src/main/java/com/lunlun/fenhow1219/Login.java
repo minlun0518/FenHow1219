@@ -23,6 +23,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.Handler;
+import android.provider.Settings;
+
 import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -62,9 +64,10 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import static android.util.Patterns.EMAIL_ADDRESS;
+import static java.security.AccessController.getContext;
 
 public class Login extends AppCompatActivity {
-
+    private BiometricPromptManager mManager;
     private static final String TAG = Log.class.getSimpleName();
     private static final int REQUEST_CODE = 101;
 
@@ -96,6 +99,7 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        mManager = BiometricPromptManager.from(this);
 
         handleSSLHandshake();
         findViews();
@@ -240,7 +244,7 @@ public class Login extends AppCompatActivity {
             Log.d(TAG, "settingpref is :" + rememberme_checkBox_statue + " " + IMEINumber + " " + userInput + " " + password);
         }
     }
-private TouchID ttouchID;
+    private TouchID go ;
     private void findViews() {
         textInputEditTextIDorEmail = findViewById(R.id.IDorEmail);
         textInputEditTextPassword = findViewById(R.id.password);
@@ -289,7 +293,6 @@ private TouchID ttouchID;
         textViewSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(getApplicationContext(), SignUp.class);
                 startActivity(intent);
                 finish();
@@ -330,12 +333,37 @@ private TouchID ttouchID;
         findViewById(R.id.touchidimageButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(Login.this,"使用指紋辨識",Toast.LENGTH_SHORT).show();
-                try {
-                    ttouchID.startFingerprintListening();
-                }catch (Exception ee){
-                    Toast.makeText(Login.this,"無法使用指紋辨識"+ee,Toast.LENGTH_SHORT).show();
-                    Log.d(TAG,"  "+ee);
+                if (mManager.isBiometricPromptEnable()) {
+                    mManager.authenticate(new BiometricPromptManager.OnBiometricIdentifyCallback() {
+                        @Override
+                        public void onUsePassword() {
+                            Toast.makeText(Login.this, "onUsePassword", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onSucceeded() {
+                            verifiedsuccessfully();
+                            Toast.makeText(Login.this, "onSucceeded", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailed() {
+
+                            Toast.makeText(Login.this, "onFailed", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onError(int code, String reason) {
+
+                            Toast.makeText(Login.this, "onError", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onCancel() {
+
+                            Toast.makeText(Login.this, "onCancel", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -378,24 +406,47 @@ private TouchID ttouchID;
         }
     }
 
+//    private String android_id = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
     //取得imei
-    public void getImei(){
+    public void getImei() {
         imei = findViewById(R.id.ed_imei);
-        try {
-            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            if (ActivityCompat.checkSelfPermission(Login.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(Login.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
-                return;
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+//        if (ActivityCompat.checkSelfPermission(Login.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(Login.this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_CODE);
+//            return;
+//        }
+//
+//        try {
+//            if (telephonyManager.getPhoneType() == TelephonyManager.PHONE_TYPE_NONE) {
+//                //Tablet
+//                IMEINumber = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
+//            } else {
+//                //Mobile
+//                IMEINumber = telephonyManager.getDeviceId();
+//            }
+////            IMEINumber = telephonyManager.getDeviceId().toString();
+//            Log.d(TAG,"使用模擬器中，到IMEI"+IMEINumber);
+//        }catch (Exception ee){
+//            Log.d(TAG,"使用模擬器中，找不到IMEI"+ee);
+//        }
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            IMEINumber = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+            Log.d(TAG,"使用模擬器中，到IMEI = "+IMEINumber);
+        } else {
+            final TelephonyManager mTelephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            if (mTelephony.getDeviceId() != null) {
+                IMEINumber = mTelephony.getDeviceId();
+                Log.d(TAG,"mTelephony.getDeviceId()"+IMEINumber);
+            } else {
+                IMEINumber = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                Log.d(TAG,"Settings.Secure.ANDROID_ID"+IMEINumber+" / ");
             }
-            IMEINumber = telephonyManager.getDeviceId();
-        }catch (Exception e){
-            Log.d(TAG,"使用模擬器中，找不到IMEI");
         }
     }
 
     public void verifiedsuccessfully(){
 //        getIntent().putExtra("LOGIN_IMEI",imei.toString());
-//        getIntent().putExtra("LOGIN_ID",eemail);
+//        getIntent().putExtra("LOGIN_ID",textInputEditTextIDorEmail.toString());
         setResult(RESULT_OK,getIntent());
         finish();
     }

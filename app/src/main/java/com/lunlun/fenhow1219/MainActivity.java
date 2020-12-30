@@ -26,16 +26,10 @@ public class MainActivity extends AppCompatActivity {
     boolean logon =false;
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE = 101;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        if(!logon){
-            Intent login = new Intent(MainActivity.this,Login.class);
-            startActivityForResult(login, REQUEST_CODE);
-        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,6 +53,11 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        if(!logon){
+            Intent login = new Intent(MainActivity.this,Login.class);
+            startActivityForResult(login, REQUEST_CODE);
+        }
+
     }
 
     @Override
@@ -75,17 +74,17 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==REQUEST_CODE){
-            if(resultCode==RESULT_OK){
-                String user_name =data.getStringExtra("USER_NAME");
-                Log.d("RESULT",user_name);
-                TextView nav_head_tv_mail =findViewById(R.id.nav_head_tv_mail);
-                TextView nav_head_tv_name =findViewById(R.id.nav_head_tv_name);
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if(requestCode==REQUEST_CODE){
+//            if(resultCode==RESULT_OK){
+//                String user_name =data.getStringExtra("USER_NAME");
+//                Log.d("RESULT",user_name);
+//                TextView nav_head_tv_mail =findViewById(R.id.nav_head_tv_mail);
+//                TextView nav_head_tv_name =findViewById(R.id.nav_head_tv_name);
 //                nav_head_tv_name.setText(user_name);
-            }
-        }
-    }
+//            }
+//        }
+//    }
 }
