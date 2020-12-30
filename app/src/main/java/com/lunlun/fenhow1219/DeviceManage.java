@@ -7,6 +7,7 @@ public class DeviceManage {
     private String deviceName;
 
     public DeviceManage() {
+
     }
 
     public DeviceManage(int devicePosition, String deviceImei, int deviceType, String deviceName) {
