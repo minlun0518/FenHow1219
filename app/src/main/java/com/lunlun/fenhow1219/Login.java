@@ -75,6 +75,7 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         mManager = BiometricPromptManager.from(this);
 
         handleSSLHandshake();
@@ -144,7 +145,6 @@ public class Login extends AppCompatActivity {
             }
             mlinearLayout.addView(inflate2);
         }
-
     }
 
     public void runrun(String userType,String urlType){
@@ -269,7 +269,7 @@ public class Login extends AppCompatActivity {
             }
         });
 
-//        textInputEditTextIDorEmail.addTextChangedListener(new TextWatcher() {
+//      textInputEditTextIDorEmail.addTextChangedListener(new TextWatcher() {
 //            @Override
 //            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 //                // ignore
